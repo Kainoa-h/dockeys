@@ -9,10 +9,8 @@
 // before sending to layout engine and interpret them into respective vim motion/command.
 // Then implement those motions by sending relevant keystrokes. Essentially doing a keystroke to keystroke remapping. 
 
-const iframe = document.getElementsByTagName('iframe')[0]   // https://stackoverflow.com/a/4388829
-iframe.contentDocument.addEventListener('keydown', eventHandler, true)
 
-const cursorTop = document.getElementsByClassName("kix-cursor-top")[0] // element to edit to show normal vs insert mode
+let cursorTop = null
 let mode = 'normal'
 let tempnormal = false // State variable for indicating temperory normal mode
 let multipleMotion = {
@@ -699,5 +697,25 @@ function activateTopLevelMenu(menuCaption) {
     simulateClick(button);
 }
 
-// Initiate to Normal Mode
-switchModeToNormal()
+function tryInitialize() {
+    const iframe = document.getElementsByTagName('iframe')[0]   // https://stackoverflow.com/a/4388829
+    const cursor = document.getElementsByClassName("kix-cursor-top")[0] // element to edit to show normal vs insert mode
+
+    if (!iframe?.contentDocument || !cursor) return false
+
+    iframe.contentDocument.addEventListener('keydown', eventHandler, true)
+    cursorTop = cursor
+    switchModeToNormal()
+    return true
+}
+
+if (!tryInitialize()) {
+    const observer = new MutationObserver(() => {
+        if (tryInitialize()) observer.disconnect();
+    });
+
+    observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true,
+    });
+}
