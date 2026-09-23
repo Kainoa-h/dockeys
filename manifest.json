@@ -17,7 +17,8 @@
                 "content.js"
             ],
             "matches": [
-                "https://docs.google.com/*"
+                "https://docs.google.com/document/d/*",
+                "https://docs.google.com/document/u/*/d/*"
             ]
         }
     ],
